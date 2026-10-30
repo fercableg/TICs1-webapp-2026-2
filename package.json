@@ -1,0 +1,11 @@
+{
+  "name": "tics1-mattress-monitoring",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Capa inteligente de monitoreo para la prevención de lesiones por presión (LPP). Interfaz web estática (Vanilla JS + ES Modules), sin frameworks ni bundlers.",
+  "scripts": {
+    "check": "find webapp/js -name '*.js' -print0 | xargs -0 -n1 node --check",
+    "smoke": "node scripts/smoke.mjs"
+  }
+}

@@ -1,7 +1,7 @@
 # Monitoreo de Colchón Inteligente (LPP)
 
 > Proyecto en TICs 1 - Universidad Diego Portales · Escuela de Informática y
-> Telecomunicaciones - 2.º semestre de 2026
+> Telecomunicaciones - 2° semestre de 2026
 
 Interfaz web para una **capa inteligente de monitoreo** orientada a la
 prevención de **lesiones por presión (LPP)**. La capa se instala sobre un

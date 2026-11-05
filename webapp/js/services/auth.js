@@ -11,6 +11,7 @@
 // ============================================================================
 
 const SESSION_KEY = 'afic.session';
+const USERS_KEY = 'afic.users'; // usuarios registrados (localStorage, demo-only)
 
 export const ROLES = {
   ADMIN: 'admin',
@@ -48,13 +49,58 @@ const sessionStore = {
   },
 };
 
+// Registered users live in localStorage (persist across browser restarts).
+// Plaintext passwords are acceptable for this local demo; a real deployment
+// would use Supabase Auth (signUp + profiles table) instead.
+const usersStore = {
+  get() {
+    try {
+      const raw = localStorage.getItem(USERS_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  },
+  set(users) {
+    try {
+      localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    } catch {
+      /* ignore */
+    }
+  },
+};
+
+function registeredUsers() {
+  const list = usersStore.get();
+  return Array.isArray(list) ? list : [];
+}
+
 export function login(username, password) {
-  const found = DEMO_USERS.find(
-    (u) => u.username === String(username ?? '').trim().toLowerCase() && u.password === password,
+  const uname = String(username ?? '').trim().toLowerCase();
+  const found = [...DEMO_USERS, ...registeredUsers()].find(
+    (u) => u.username === uname && u.password === password,
   );
   if (!found) return { ok: false, error: 'Usuario o contraseña incorrectos.' };
   const user = { username: found.username, role: found.role, name: found.name };
   sessionStore.set(JSON.stringify(user));
+  return { ok: true, user };
+}
+
+// Registers a new local account (role always `client`). Returns the same shape
+// as login(): { ok, user } | { ok, error }.
+export function register({ name, username, password }) {
+  const uname = String(username ?? '').trim().toLowerCase();
+  const nombre = String(name ?? '').trim();
+  if (!nombre) return { ok: false, error: 'El nombre es obligatorio.' };
+  if (!uname) return { ok: false, error: 'El usuario es obligatorio.' };
+  if (!password || password.length < 6) {
+    return { ok: false, error: 'La contraseña debe tener al menos 6 caracteres.' };
+  }
+  const taken = [...DEMO_USERS, ...registeredUsers()].some((u) => u.username === uname);
+  if (taken) return { ok: false, error: 'Ese nombre de usuario ya está en uso.' };
+
+  const user = { username: uname, role: ROLES.CLIENT, name: nombre };
+  usersStore.set([...registeredUsers(), user]);
   return { ok: true, user };
 }
 

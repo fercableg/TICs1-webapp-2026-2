@@ -180,6 +180,18 @@ check('login is case-insensitive on username', () => {
 check('getSession is null without browser storage', () => {
   assert.equal(auth.getSession(), null);
 });
+check('register rejects a duplicate username', () => {
+  const res = auth.register({ name: 'X', username: 'admin', password: 'secret123' });
+  assert.equal(res.ok, false);
+});
+check('register rejects a short password', () => {
+  const res = auth.register({ name: 'X', username: 'nuevo', password: '123' });
+  assert.equal(res.ok, false);
+});
+check('register rejects a missing name', () => {
+  const res = auth.register({ name: '  ', username: 'nuevo', password: 'secret123' });
+  assert.equal(res.ok, false);
+});
 
 console.log('\n[6] mock backend + apiClient contract');
 await checkAsync('listDevices returns 3 devices (online + offline + empty)', async () => {

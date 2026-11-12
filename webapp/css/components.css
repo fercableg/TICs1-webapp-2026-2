@@ -659,9 +659,9 @@
   white-space: nowrap;
 }
 
-.theme-control__text {
-  font-size: 0.82rem;
-  color: var(--text-muted);
+.theme-control__icon {
+  font-size: 1rem;
+  line-height: 1;
 }
 
 /* Connection status */

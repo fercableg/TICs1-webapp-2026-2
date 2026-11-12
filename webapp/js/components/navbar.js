@@ -40,27 +40,35 @@ function buildBrand() {
   );
 }
 
-// Interruptor de tema (claro/oscuro) con texto descriptivo. Se monta tanto en
-// la barra de la landing (sin sesión) como en la barra autenticada, de modo que
-// el modo nocturno sea global desde el inicio.
+// Interruptor de tema (claro/oscuro) con emoji indicador (☀️/🌙). Se monta
+// tanto en la barra de la landing (sin sesión) como en la barra autenticada,
+// de modo que el modo nocturno sea global desde el inicio.
 function buildThemeToggle() {
+  const icon = el('span', { class: 'theme-control__icon', 'aria-hidden': 'true' });
   const input = el('input', {
     type: 'checkbox',
     class: 'theme-switch__input',
     'aria-label': 'Modo nocturno',
     onchange: () => {
       toggleTheme();
-      input.checked = currentTheme() === 'dark';
+      sync();
     },
   });
-  input.checked = currentTheme() === 'dark';
+
+  function sync() {
+    const dark = currentTheme() === 'dark';
+    input.checked = dark;
+    icon.textContent = dark ? '🌙' : '☀️';
+  }
+
   const label = el('label', {
     class: 'theme-switch',
     title: 'Modo nocturno (tema oscuro)',
   }, input, el('span', { class: 'theme-switch__slider' }));
-  return el('span', { class: 'theme-control' },
-    label,
-    el('span', { class: 'theme-control__text', text: 'Modo nocturno' }));
+
+  sync();
+
+  return el('span', { class: 'theme-control' }, label, icon);
 }
 
 export function renderNavbar(container) {

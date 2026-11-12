@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="Personaliza tu perfil: foto, nombre, usuario y correo." />
+  <title>Perfil · Monitoreo de Colchón Inteligente</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/views.css" />
+</head>
+<body data-view="profile">
+  <div id="navbar-root"></div>
+
+  <main id="view-root" class="view-root">
+    <div class="page page--narrow">
+      <div class="page-header">
+        <h1>Perfil</h1>
+        <p class="page-subtitle">Personaliza tu foto, nombre, usuario y correo.</p>
+      </div>
+
+      <section class="card">
+        <header class="card__header"><h2>Tu información</h2></header>
+        <div class="card__body">
+          <form id="profile-form" class="profile-form">
+            <div class="profile-photo-row">
+              <img id="profile-photo" class="profile-photo" alt="Foto de perfil" hidden />
+              <div id="profile-photo-empty" class="profile-photo profile-photo--empty" aria-hidden="true">👤</div>
+              <div class="profile-photo-actions">
+                <button id="profile-photo-btn" class="btn btn--outline btn--sm" type="button">Cambiar foto</button>
+                <button id="profile-photo-remove" class="btn btn--ghost btn--sm" type="button">Quitar foto</button>
+                <input id="profile-photo-input" class="visually-hidden" type="file" accept="image/*" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="profile-name">Nombre</label>
+              <input id="profile-name" class="input" type="text" autocomplete="name" />
+            </div>
+
+            <div class="field">
+              <label for="profile-user">Usuario</label>
+              <input id="profile-user" class="input" type="text" autocomplete="username" />
+              <span id="profile-user-hint" class="field__hint" hidden>El usuario de una cuenta de demostración no se puede cambiar.</span>
+            </div>
+
+            <div class="field">
+              <label for="profile-email">Correo</label>
+              <input id="profile-email" class="input" type="email" placeholder="correo@ejemplo.com" autocomplete="email" />
+            </div>
+
+            <p id="profile-error" class="login-error" role="alert" hidden></p>
+
+            <button class="btn btn--primary" type="submit">Guardar cambios</button>
+          </form>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <noscript>
+    <p class="noscript">Esta aplicación requiere JavaScript para funcionar. Habilítalo y recarga la página.</p>
+  </noscript>
+
+  <script type="module" src="js/app-shell.js"></script>
+  <script type="module" src="js/page.js"></script>
+</body>
+</html>

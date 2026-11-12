@@ -12,9 +12,8 @@
 //   6. The poller happy path (which also guards against the bootstrap bug
 //      where devices never load without a pre-selected device).
 //
-// DOM-coupled view render() functions are intentionally NOT exercised here
-// (they require a browser); they are covered by the manual browser check and
-// the adversarial review.
+// Views now export init(root) and hydrate their own static HTML; they are
+// exercised end-to-end by scripts/check-pages.mjs (Chromium headless), not here.
 //
 // Run:  node scripts/smoke.mjs   (or `npm run smoke`)
 // ============================================================================
@@ -29,7 +28,6 @@ import * as dom from '../webapp/js/core/dom.js';
 import * as store from '../webapp/js/services/store.js';
 import * as ui from '../webapp/js/core/ui.js';
 import * as chart from '../webapp/js/core/chart.js';
-import * as router from '../webapp/js/core/router.js';
 import * as theme from '../webapp/js/services/theme.js';
 import * as auth from '../webapp/js/services/auth.js';
 import * as mockData from '../webapp/js/services/mockData.js';
@@ -38,7 +36,11 @@ import * as poller from '../webapp/js/services/poller.js';
 import * as navbar from '../webapp/js/components/navbar.js';
 import * as helpers from '../webapp/js/views/helpers.js';
 import * as settingsForm from '../webapp/js/views/settingsForm.js';
+import * as authCard from '../webapp/js/views/authCard.js';
+import * as vLanding from '../webapp/js/views/landing.js';
 import * as vLogin from '../webapp/js/views/login.js';
+import * as vRegistro from '../webapp/js/views/registro.js';
+import * as vProfile from '../webapp/js/views/profile.js';
 import * as vDashboard from '../webapp/js/views/dashboard.js';
 import * as vMonitoreo from '../webapp/js/views/monitoreo.js';
 import * as vPositions from '../webapp/js/views/positions.js';
@@ -49,13 +51,13 @@ import * as vApis from '../webapp/js/views/apis.js';
 import * as vManual from '../webapp/js/views/manual.js';
 import * as vContact from '../webapp/js/views/contact.js';
 import * as vAbout from '../webapp/js/views/about.js';
-import { installDom, makeContainer } from './dom-shim.mjs';
 
 const IMPORTED = [
-  'config', 'utils', 'dom', 'store', 'ui', 'chart', 'router', 'theme', 'auth',
+  'config', 'utils', 'dom', 'store', 'ui', 'chart', 'theme', 'auth',
   'mockData', 'apiClient', 'poller', 'navbar', 'helpers', 'settingsForm',
-  'login', 'dashboard', 'monitoreo', 'positions', 'alerts', 'history',
-  'settings', 'apis', 'manual', 'contact', 'about',
+  'authCard', 'landing', 'login', 'registro', 'profile', 'dashboard',
+  'monitoreo', 'positions', 'alerts', 'history', 'settings', 'apis', 'manual',
+  'contact', 'about',
 ];
 
 // --- Test harness -------------------------------------------------------------
@@ -89,11 +91,11 @@ console.log('Smoke test — Monitoreo de Colchón Inteligente\n');
 
 console.log(`[1] Module imports (${IMPORTED.length})`);
 check(`all ${IMPORTED.length} modules imported`, () => {
-  assert.ok(IMPORTED.length === 26, 'expected 26 modules');
+  assert.ok(IMPORTED.length === 29, 'expected 29 modules');
   assert.equal(typeof CONFIG, 'object');
-  assert.equal(typeof vDashboard.render, 'function');
-  assert.equal(typeof vMonitoreo.render, 'function');
-  assert.equal(typeof vApis.render, 'function');
+  assert.equal(typeof vDashboard.init, 'function');
+  assert.equal(typeof vMonitoreo.init, 'function');
+  assert.equal(typeof vApis.init, 'function');
 });
 
 console.log('\n[2] config');
@@ -192,6 +194,33 @@ check('register rejects a missing name', () => {
   const res = auth.register({ name: '  ', username: 'nuevo', password: 'secret123' });
   assert.equal(res.ok, false);
 });
+check('register stores the password so the account can log in', () => {
+  const r = auth.register({ name: 'Ana Test', username: 'ana', password: 'secret123', email: 'ana@test.com' });
+  assert.equal(r.ok, true);
+  const l = auth.login('ana', 'secret123');
+  assert.equal(l.ok, true);
+  assert.equal(l.user.email, 'ana@test.com');
+});
+check('updateProfile changes name/email/photo', () => {
+  const res = auth.updateProfile('ana', { name: 'Ana Actualizada', email: 'nueva@test.com', photo: 'data:image/png;base64,AAA' });
+  assert.equal(res.ok, true);
+  assert.equal(res.user.name, 'Ana Actualizada');
+  assert.equal(res.user.email, 'nueva@test.com');
+  assert.equal(res.user.photo, 'data:image/png;base64,AAA');
+});
+check('updateProfile can rename a registered user', () => {
+  const res = auth.updateProfile('ana', { username: 'ana2' });
+  assert.equal(res.ok, true);
+  assert.equal(res.user.username, 'ana2');
+});
+check('updateProfile rejects a duplicate username', () => {
+  const res = auth.updateProfile('ana2', { username: 'admin' });
+  assert.equal(res.ok, false);
+});
+check('updateProfile rejects renaming a demo account', () => {
+  const res = auth.updateProfile('admin', { username: 'otro' });
+  assert.equal(res.ok, false);
+});
 
 console.log('\n[6] mock backend + apiClient contract');
 await checkAsync('listDevices returns 3 devices (online + offline + empty)', async () => {
@@ -271,104 +300,6 @@ check('poller can be stopped cleanly', () => {
   poller.stopPoller();
   assert.ok(true);
 });
-
-// --- 8. Render every view through a minimal DOM shim ---------------------------
-// Catches structural bugs that `node --check` cannot (e.g. a root element that
-// closes early, dropping its later children). Per-view invariants below are the
-// regression tests for exactly that class of bug.
-console.log('\n[8] view render() (DOM shim)');
-
-installDom();
-
-// Reset the store to an empty, quiescent state so each view exercises its
-// "no data yet" path without kicking off asynchronous fetches.
-store.setState({
-  user: null,
-  devices: [],
-  deviceId: null,
-  settings: null,
-  lastReading: null,
-  recentReadings: [],
-  alerts: [],
-  connectionStatus: 'connected',
-});
-
-const VIEWS = [
-  ['login', vLogin.render, (root) => {
-    assert.equal(root.tagName, 'MAIN');
-    assert.ok(root.querySelector('.login-card'), 'missing .login-card');
-  }],
-  ['dashboard', vDashboard.render, (root) => {
-    assert.ok(root.querySelector('.page-header'), 'missing .page-header');
-    assert.ok(root.querySelector('.stat-grid'), 'missing .stat-grid');
-  }],
-  ['monitoreo', vMonitoreo.render, (root) => {
-    assert.equal(root.querySelectorAll('.bed-cell').length, 6);
-    assert.equal(root.querySelectorAll('.sensor-card').length, 6);
-  }],
-  ['positions', vPositions.render, (root) => {
-    assert.ok(root.querySelector('.chip-group'), 'missing .chip-group');
-    assert.ok(root.querySelector('.table'), 'missing .table');
-  }],
-  ['alerts', vAlerts.render, (root) => {
-    assert.ok(root.querySelector('.tabs'), 'missing .tabs');
-  }],
-  ['history', vHistory.render, (root) => {
-    assert.ok(root.querySelector('.table'), 'missing .table');
-    assert.ok(root.querySelector('canvas'), 'missing canvas');
-  }],
-  ['settings', vSettings.render, (root) => {
-    assert.ok(root.querySelector('.settings-form'), 'missing .settings-form');
-    assert.ok(root.querySelector('.table'), 'missing .table');
-  }],
-  ['apis', vApis.render, (root) => {
-    assert.ok(root.querySelectorAll('.endpoint').length >= 3, 'expected endpoint cards');
-  }],
-  ['manual', vManual.render, (root) => {
-    assert.equal(root.querySelectorAll('.accordion').length, 5, 'expected 5 accordion sections');
-  }],
-  ['contact', vContact.render, (root) => {
-    assert.ok(root.querySelector('.contact-form'), 'missing .contact-form');
-  }],
-  ['about', vAbout.render, (root) => {
-    assert.ok(root.querySelector('.disclaimer'), 'missing .disclaimer');
-    assert.ok(root.querySelector('.kv'), 'missing .kv');
-  }],
-];
-
-for (const [name, render, verify] of VIEWS) {
-  const container = makeContainer();
-  let cleanup = null;
-  let renderError = null;
-  try {
-    cleanup = render(container);
-  } catch (err) {
-    renderError = err;
-  }
-  if (renderError) {
-    failed += 1;
-    console.error(`  ✗ ${name} view render threw: ${renderError.message}`);
-    continue;
-  }
-  passed += 1;
-  console.log(`  ✓ ${name} view renders`);
-  try {
-    assert.equal(container.children.length, 1, 'expected exactly one root element');
-    const root = container.children[0];
-    assert.ok(root.children.length > 0, 'root element is empty');
-    verify(root);
-  } catch (err) {
-    failed += 1;
-    console.error(`  ✗ ${name} view structure: ${err.message}`);
-  }
-  if (typeof cleanup === 'function') {
-    try {
-      cleanup();
-    } catch {
-      /* cleanup errors are non-fatal */
-    }
-  }
-}
 
 // --- Summary -------------------------------------------------------------------
 console.log(`\n${'-'.repeat(48)}`);

@@ -4,25 +4,148 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="light dark" />
-  <meta name="description" content="Capa inteligente de monitoreo para la prevención de lesiones por presión (LPP)." />
-  <title>Monitoreo de Colchón Inteligente - Proyecto TICs 1</title>
+  <meta name="description" content="Bed sense — capa inteligente de monitoreo para la prevención de lesiones por presión (LPP)." />
+  <title>Bed sense · Monitoreo de Colchón Inteligente</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="css/tokens.css" />
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/components.css" />
   <link rel="stylesheet" href="css/views.css" />
 </head>
-<body>
-  <!-- The navbar is mounted here (hidden until a session exists). -->
+<body data-view="landing">
   <div id="navbar-root"></div>
 
-  <!-- The active route renders into this container. -->
-  <div id="view-root" class="view-root"></div>
+  <main id="view-root" class="view-root">
+    <div class="landing">
+
+      <!-- Hero -->
+      <header class="landing-hero">
+        <div class="landing-container landing-hero__inner">
+          <div class="landing-hero__copy">
+            <h1 class="landing-hero__title">Monitoreo de Colchón Inteligente</h1>
+            <p class="landing-hero__subtitle">Capa inteligente para la prevención de lesiones por presión (LPP): monitoreo continuo de presión, temperatura y humedad con alertas y recordatorios de cambio de posición.</p>
+            <div class="landing-hero__actions">
+              <a class="btn btn--primary" href="login.html">Iniciar sesión</a>
+              <a class="btn btn--outline" href="registro.html">Registrarse</a>
+              <a class="btn btn--ghost" href="#como-funciona">Ver cómo funciona</a>
+            </div>
+          </div>
+
+          <div class="hero-anim" aria-hidden="true">
+            <div class="hero-bed">
+              <div class="hero-bed__body"></div>
+              <!-- Los 6 puntos de presión se inyectan desde landing.js (SENSORS). -->
+            </div>
+            <div class="hero-flow">
+              <span class="hero-pulse"></span>
+              <span class="hero-flow__arrow">→</span>
+              <div class="hero-monitor">
+                <div class="hero-monitor__wave"></div>
+                <div class="hero-monitor__label">datos en tiempo real</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- El problema -->
+      <section class="landing-section" id="problema">
+        <div class="landing-container">
+          <h2 class="landing-section__title">El problema</h2>
+          <p>Las lesiones por presión (LPP) se producen cuando una persona permanece mucho tiempo en la misma posición: la presión sostenida sobre prominencias óseas reduce el riego sanguíneo y daña la piel. Afectan especialmente a personas postradas o con movilidad reducida.</p>
+          <p>Los colchones antiescaras redistribuyen la presión, pero por sí solos no previenen todas las lesiones ni entregan información continua de las condiciones de la superficie de contacto.</p>
+        </div>
+      </section>
+
+      <!-- La solución -->
+      <section class="landing-section" id="que-es">
+        <div class="landing-container">
+          <h2 class="landing-section__title">La solución</h2>
+          <p>Una capa flexible de bajo costo que se instala sobre un colchón antiescaras existente. Mide la presión en las zonas de mayor riesgo, además de temperatura y humedad, y transmite todo por Wi-Fi a esta interfaz web.</p>
+          <ul class="list">
+            <li><strong>No invasiva</strong>: se adapta al colchón que ya tienes.</li>
+            <li><strong>En tiempo real</strong>: datos continuos y visibles desde cualquier navegador.</li>
+            <li><strong>Con alertas</strong>: avisa antes de que se produzca una lesión.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Cómo funciona -->
+      <section class="landing-section" id="como-funciona">
+        <div class="landing-container">
+          <h2 class="landing-section__title">Cómo funciona</h2>
+          <p>El microcontrolador ESP32 adquiere las señales de los sensores, las procesa y las envía al servidor. La interfaz web las muestra y emite alertas y recordatorios de cambio de posición.</p>
+          <pre class="code-block">Sensores FSR406 + AHT20  →  ESP32  →  Wi-Fi  →  Servidor  →  Interfaz web</pre>
+        </div>
+      </section>
+
+      <!-- Qué mide -->
+      <section class="landing-section" id="que-mide">
+        <div class="landing-container">
+          <h2 class="landing-section__title">Qué mide</h2>
+          <ul class="list">
+            <li><strong>Presión</strong> en 6 zonas de prominencia ósea (0–4095 ADC).</li>
+            <li><strong>Temperatura y humedad</strong> con el sensor AHT20.</li>
+            <li><strong>Postura orientativa</strong>: boca arriba, lado izquierdo o lado derecho.</li>
+            <li><strong>Alertas y recordatorios</strong> de cambio de posición.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Distribución de sensores -->
+      <section class="landing-section" id="sensores">
+        <div class="landing-container">
+          <h2 class="landing-section__title">Distribución de sensores</h2>
+          <p>Seis sensores FSR406 sobre las prominencias óseas (occipital, escápulas, sacro y talones) más un sensor AHT20 central de temperatura y humedad.</p>
+          <ul class="list" id="sensor-list"></ul>
+        </div>
+      </section>
+
+      <!-- Alertas -->
+      <section class="landing-section" id="alertas">
+        <div class="landing-container">
+          <h2 class="landing-section__title">Alertas y seguridad</h2>
+          <ul class="list">
+            <li><strong>Crítica</strong> — dispositivo desconectado o condición que requiere revisión inmediata.</li>
+            <li><strong>Advertencia</strong> — permanencia excesiva en una posición o variación de temperatura.</li>
+            <li><strong>Informativa</strong> — eventos de registro (cambio de posición, cama vacía).</li>
+          </ul>
+          <p class="muted">Las mediciones son orientativas y de apoyo al cuidado; no constituyen diagnóstico médico.</p>
+        </div>
+      </section>
+
+      <!-- Equipo -->
+      <section class="landing-section" id="equipo">
+        <div class="landing-container">
+          <h2 class="landing-section__title">Equipo</h2>
+          <ul class="list">
+            <li>Fernando Cabrera Legue — Jefe de proyecto</li>
+            <li>Cinthya Fuentealba Bravo — Aplicación y comunicaciones</li>
+            <li>Gonzalo Letelier Muñoz — Hardware y sensores</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Llamada a la acción -->
+      <section class="landing-section landing-section--auth" id="auth">
+        <div class="landing-container landing-auth">
+          <h2 class="landing-section__title">¿Listo para comenzar?</h2>
+          <p class="muted">Inicia sesión o crea una cuenta para acceder al monitoreo.</p>
+          <div class="landing-hero__actions">
+            <a class="btn btn--primary" href="login.html">Iniciar sesión</a>
+            <a class="btn btn--outline" href="registro.html">Registrarse</a>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
 
   <noscript>
     <p class="noscript">Esta aplicación requiere JavaScript para funcionar. Habilítalo y recarga la página.</p>
   </noscript>
 
-  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/app-shell.js"></script>
+  <script type="module" src="js/page.js"></script>
 </body>
 </html>

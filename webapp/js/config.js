@@ -19,6 +19,11 @@ export const CONFIG = {
   CONNECTION_STALE_MS: 15000,     // last-reading age considered "stale".
   HISTORY_PAGE_SIZE: 500,
 
+  // UI — selector de dispositivo (colchón) en la barra superior. Con un único
+  // dispositivo desplegado se oculta; actívalo cuando el proyecto escale a
+  // varios colchones (el código del selector se conserva para ese caso).
+  SHOW_DEVICE_SELECTOR: false,
+
   // Firmware thresholds documented in the project report (kept in sync with
   // the ESP32 sketch so the UI defaults match the hardware behaviour).
   FIRMWARE: {
@@ -33,6 +38,7 @@ export const CONFIG = {
     REPOSITION_MIN: 120,        // T_REPOSICION: minutes between recommended turns.
   },
 
+  APP_BRAND: 'Bed sense',                    // nombre comercial (logo de la barra superior)
   APP_NAME: 'Monitoreo de Colchón Inteligente',
   APP_SHORT: 'Proyecto TICs 1',
   APP_VERSION: '0.2.0',

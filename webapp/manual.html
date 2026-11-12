@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="Manual de usuario paso a paso para cuidadores y familiares." />
+  <title>Manual · Monitoreo de Colchón Inteligente</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/views.css" />
+</head>
+<body data-view="manual">
+  <div id="navbar-root"></div>
+
+  <main id="view-root" class="view-root">
+    <div class="page page--narrow">
+      <div class="page-header">
+        <h1>Manual de usuario</h1>
+        <p class="page-subtitle">Guía paso a paso para cuidadores y familiares.</p>
+      </div>
+
+      <details class="accordion">
+        <summary class="accordion__summary">
+          <span>1. Cómo funciona el sistema</span>
+          <span class="accordion__chevron" aria-hidden="true">▾</span>
+        </summary>
+        <div class="accordion__content">
+          <p>La capa inteligente se instala sobre un colchón antiescaras existente y mide presión, temperatura y humedad en la superficie de contacto.</p>
+          <p>Un microcontrolador ESP32 adquiere las mediciones y las envía por Wi-Fi a esta interfaz, donde puedes consultarlas en tiempo real.</p>
+          <pre class="code-block">Sensores → ESP32 → Wi-Fi → Servidor → Interfaz web</pre>
+        </div>
+      </details>
+
+      <details class="accordion">
+        <summary class="accordion__summary">
+          <span>2. Distribución de sensores</span>
+          <span class="accordion__chevron" aria-hidden="true">▾</span>
+        </summary>
+        <div class="accordion__content">
+          <ul class="list">
+            <li><strong>Occipital (p1)</strong> — parte posterior de la cabeza.</li>
+            <li><strong>Escápula izquierda (p2) y derecha (p3)</strong> — omóplatos, para detectar giros laterales.</li>
+            <li><strong>Sacro (p4)</strong> — zona sacra, la más relevante para la prevención.</li>
+            <li><strong>Talón izquierdo (p5) y derecho (p6)</strong> — talones, para detectar giros laterales.</li>
+            <li>Un sensor de temperatura y humedad (AHT20) ubicado al centro.</li>
+          </ul>
+          <p class="muted">Los valores se muestran como lecturas relativas (0–4095), no como presión clínica.</p>
+        </div>
+      </details>
+
+      <details class="accordion">
+        <summary class="accordion__summary">
+          <span>3. Definición de alertas</span>
+          <span class="accordion__chevron" aria-hidden="true">▾</span>
+        </summary>
+        <div class="accordion__content">
+          <ul class="list">
+            <li><strong>Crítica</strong> — dispositivo desconectado o condición que requiere revisión inmediata.</li>
+            <li><strong>Advertencia</strong> — tiempo máximo en la misma posición o variación de temperatura.</li>
+            <li><strong>Informativa</strong> — eventos de registro (cambio de posición, cama vacía).</li>
+          </ul>
+          <p>Umbrales de referencia del firmware:</p>
+          <ul class="list">
+            <li>Confirmación de postura: 10 min.</li>
+            <li>Alerta por tiempo: 120 min.</li>
+            <li>Variación de temperatura: ±1.5 °C.</li>
+            <li>Cama vacía: suma de presión &lt; 300.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="accordion">
+        <summary class="accordion__summary">
+          <span>4. Pasos operativos</span>
+          <span class="accordion__chevron" aria-hidden="true">▾</span>
+        </summary>
+        <div class="accordion__content">
+          <ol class="steps">
+            <li>Inicia sesión con tu cuenta (cuidador o administrador).</li>
+            <li>Selecciona el dispositivo (colchón) que quieres supervisar.</li>
+            <li>Revisa el Panel para ver postura, temperatura y humedad actuales.</li>
+            <li>En «Monitoreo» observa el mapa de presión por zona.</li>
+            <li>En «Alertas» confirma (ACK) las alertas que ya revisaste.</li>
+            <li>En «Posiciones» registra manualmente un cambio de postura si corresponde.</li>
+            <li>Si eres administrador, ajusta umbrales en «Monitoreo» o en «Ajustes».</li>
+          </ol>
+        </div>
+      </details>
+
+      <details class="accordion">
+        <summary class="accordion__summary">
+          <span>5. Solución de problemas</span>
+          <span class="accordion__chevron" aria-hidden="true">▾</span>
+        </summary>
+        <div class="accordion__content">
+          <ul class="list">
+            <li><strong>«Sin conexión»</strong> — verifica que el ESP32 esté encendido y con Wi-Fi disponible. La interfaz reintenta automáticamente.</li>
+            <li><strong>«Cama vacía»</strong> — la presión total está bajo el umbral; revisa que la persona esté sobre el colchón.</li>
+            <li><strong>Valores «—»</strong> — lectura fuera de rango o no disponible; espera la siguiente muestra.</li>
+            <li><strong>Alerta no se actualiza</strong> — confirma (ACK) y espera el siguiente ciclo de sondeo.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </main>
+
+  <noscript>
+    <p class="noscript">Esta aplicación requiere JavaScript para funcionar. Habilítalo y recarga la página.</p>
+  </noscript>
+
+  <script type="module" src="js/app-shell.js"></script>
+  <script type="module" src="js/page.js"></script>
+</body>
+</html>

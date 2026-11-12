@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="Información del proyecto y avisos importantes." />
+  <title>Acerca de · Monitoreo de Colchón Inteligente</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/views.css" />
+</head>
+<body data-view="about">
+  <div id="navbar-root"></div>
+
+  <main id="view-root" class="view-root">
+    <div class="page page--narrow">
+      <div class="page-header">
+        <h1>Acerca de</h1>
+        <p class="page-subtitle">Información del proyecto y avisos importantes.</p>
+      </div>
+
+      <aside class="disclaimer" role="note">
+        <strong>⚠️ Aviso legal</strong>
+        <p>Este dispositivo NO entrega diagnóstico médico. Las mediciones, alertas y recomendaciones son orientativas y de apoyo al cuidado; no sustituyen la evaluación ni las indicaciones del personal de salud.</p>
+      </aside>
+
+      <section class="card">
+        <header class="card__header"><h2>El proyecto</h2></header>
+        <div class="card__body">
+          <p>Capa inteligente de monitoreo para la prevención de lesiones por presión (LPP), desarrollada como proyecto semestral de la asignatura Proyectos en TICs 1, Universidad Diego Portales.</p>
+          <p>Complementa un colchón antiescaras existente midiendo presión, temperatura y humedad, y visualizándolas en esta interfaz web.</p>
+        </div>
+      </section>
+
+      <section class="card">
+        <header class="card__header"><h2>Datos del sistema</h2></header>
+        <div class="card__body">
+          <div class="kv">
+            <div><span>Aplicación</span><strong>Monitoreo de Colchón Inteligente</strong></div>
+            <div><span>Versión</span><strong>0.2.0</strong></div>
+            <div><span>Modo de datos</span><strong>Mock (sin backend)</strong></div>
+            <div><span>Hardware</span><strong>ESP32 · 6× FSR406 · AHT20</strong></div>
+            <div><span>Stack</span><strong>HTML5 · CSS3 · Vanilla JS (ES Modules)</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <header class="card__header"><h2>Equipo</h2></header>
+        <div class="card__body">
+          <ul class="list">
+            <li>Fernando Cabrera Legue — Jefe de proyecto</li>
+            <li>Cinthya Fuentealba Bravo — Aplicación y comunicaciones</li>
+            <li>Gonzalo Letelier Muñoz — Hardware y sensores</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card" id="about-dev-tools">
+        <header class="card__header"><h2>Desarrollo</h2></header>
+        <div class="card__body">
+          <div class="dev-tools">
+            <h3>Herramientas de desarrollo</h3>
+            <p class="muted">Modo mock activo. Estas opciones ayudan a probar la resiliencia de la interfaz.</p>
+            <button id="about-fail-btn" class="btn btn--outline btn--sm" type="button">Simular fallo de red</button>
+            <button id="about-reset-btn" class="btn btn--ghost btn--sm" type="button">Reiniciar datos demo</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <noscript>
+    <p class="noscript">Esta aplicación requiere JavaScript para funcionar. Habilítalo y recarga la página.</p>
+  </noscript>
+
+  <script type="module" src="js/app-shell.js"></script>
+  <script type="module" src="js/page.js"></script>
+</body>
+</html>

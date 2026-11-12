@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="Configuración del dispositivo y del paciente (solo administradores)." />
+  <title>Ajustes · Monitoreo de Colchón Inteligente</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/views.css" />
+</head>
+<body data-view="settings">
+  <div id="navbar-root"></div>
+
+  <main id="view-root" class="view-root">
+    <div class="page">
+      <div class="page-header">
+        <h1>Ajustes</h1>
+        <p class="page-subtitle">Configuración del dispositivo y del paciente (solo administradores).</p>
+      </div>
+
+      <section class="card">
+        <header class="card__header"><h2>Configuración</h2></header>
+        <div class="card__body"><div id="settings-form"></div></div>
+      </section>
+
+      <section class="card">
+        <header class="card__header"><h2>Gestión de dispositivos</h2></header>
+        <div class="card__body">
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr><th>ID</th><th>Nombre</th><th>Estado</th><th>Última lectura</th></tr>
+              </thead>
+              <tbody id="settings-devices-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <noscript>
+    <p class="noscript">Esta aplicación requiere JavaScript para funcionar. Habilítalo y recarga la página.</p>
+  </noscript>
+
+  <script type="module" src="js/app-shell.js"></script>
+  <script type="module" src="js/page.js"></script>
+</body>
+</html>

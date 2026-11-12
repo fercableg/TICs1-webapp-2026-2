@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="Endpoints del backend (Supabase / PostgREST) y código listo para el ESP32." />
+  <title>APIs · Monitoreo de Colchón Inteligente</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/views.css" />
+</head>
+<body data-view="apis">
+  <div id="navbar-root"></div>
+
+  <main id="view-root" class="view-root">
+    <div class="page">
+      <div class="page-header">
+        <h1>APIs</h1>
+        <p class="page-subtitle">Endpoints del backend (Supabase / PostgREST) y código listo para el ESP32.</p>
+      </div>
+
+      <section class="card">
+        <header class="card__header"><h2>Cómo conectarse</h2></header>
+        <div class="card__body">
+          <p>Toda la red de la interfaz pasa por <code>apiClient.js</code>. Para apuntar al backend real, pon <code>CONFIG.USE_MOCK_DATA = false</code> y rellena <code>API_BASE_URL</code> y <code>SUPABASE_ANON_KEY</code> en <code>config.js</code>.</p>
+          <p class="muted">La anon-key de Supabase es pública por diseño; el control de acceso fino se hace con políticas de fila (RLS).</p>
+          <pre class="code-block" id="apis-headers"></pre>
+        </div>
+      </section>
+
+      <section class="card">
+        <header class="card__header"><h2>Firmware → servidor (ESP32)</h2></header>
+        <div class="card__body" id="apis-esp32"></div>
+      </section>
+
+      <section class="card">
+        <header class="card__header"><h2>Servidor → interfaz (Web)</h2></header>
+        <div class="card__body" id="apis-web"></div>
+      </section>
+    </div>
+  </main>
+
+  <noscript>
+    <p class="noscript">Esta aplicación requiere JavaScript para funcionar. Habilítalo y recarga la página.</p>
+  </noscript>
+
+  <script type="module" src="js/app-shell.js"></script>
+  <script type="module" src="js/page.js"></script>
+</body>
+</html>

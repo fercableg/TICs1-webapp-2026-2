@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="Alertas activas y resueltas del dispositivo." />
+  <title>Alertas · Monitoreo de Colchón Inteligente</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/views.css" />
+</head>
+<body data-view="alerts">
+  <div id="navbar-root"></div>
+
+  <main id="view-root" class="view-root">
+    <div class="page">
+      <div class="page-header">
+        <h1>Alertas</h1>
+        <p class="page-subtitle">Alertas activas y resueltas del dispositivo. Las alertas son orientativas, no un diagnóstico.</p>
+      </div>
+
+      <section class="card">
+        <div class="card__body">
+          <div class="tabs" role="tablist">
+            <button id="tab-active" class="tab tab--active" role="tab" aria-selected="true">Activas</button>
+            <button id="tab-resolved" class="tab" role="tab" aria-selected="false">Resueltas</button>
+          </div>
+
+          <div id="alerts-active-panel">
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr><th>Severidad</th><th>Mensaje</th><th>Fecha</th><th>Acción</th></tr>
+                </thead>
+                <tbody id="alerts-active-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="alerts-resolved-panel" hidden>
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr><th>Severidad</th><th>Mensaje</th><th>Fecha</th><th>Confirmada por</th></tr>
+                </thead>
+                <tbody id="alerts-resolved-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <noscript>
+    <p class="noscript">Esta aplicación requiere JavaScript para funcionar. Habilítalo y recarga la página.</p>
+  </noscript>
+
+  <script type="module" src="js/app-shell.js"></script>
+  <script type="module" src="js/page.js"></script>
+</body>
+</html>

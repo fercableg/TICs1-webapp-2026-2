@@ -1,6 +1,7 @@
 // ============================================================================
-// navbar.js — Persistent application header: brand, device selector, theme
-// switch, live connection status, user badge + logout, and role-aware nav.
+// navbar.js — Encabezado persistente de la app: marca, selector de dispositivo,
+// cambio de tema, estado de conexión en vivo, badge de usuario + salir, y
+// navegación por rol. En MPA los enlaces apuntan a páginas `.html` reales.
 // ============================================================================
 
 import { CONFIG } from '../config.js';
@@ -14,28 +15,71 @@ import * as poller from '../services/poller.js';
 const DEVICE_KEY = 'afic.deviceId';
 
 const LINKS = [
-  { path: '/dashboard', label: 'Panel', icon: '📊' },
-  { path: '/monitoreo', label: 'Monitoreo', icon: '🧭' },
-  { path: '/positions', label: 'Posiciones', icon: '🛏️' },
-  { path: '/alerts', label: 'Alertas', icon: '🔔' },
-  { path: '/history', label: 'Historial', icon: '📈' },
-  { path: '/settings', label: 'Ajustes', icon: '⚙️', adminOnly: true },
-  { path: '/apis', label: 'APIs', icon: '🔌' },
-  { path: '/manual', label: 'Manual', icon: '📖' },
-  { path: '/contact', label: 'Contacto', icon: '✉️' },
-  { path: '/about', label: 'Acerca de', icon: 'ℹ️' },
+  { file: 'dashboard.html', label: 'Panel', icon: '📊' },
+  { file: 'monitoreo.html', label: 'Monitoreo', icon: '🧭' },
+  { file: 'positions.html', label: 'Posiciones', icon: '🛏️' },
+  { file: 'alerts.html', label: 'Alertas', icon: '🔔' },
+  { file: 'history.html', label: 'Historial', icon: '📈' },
+  { file: 'settings.html', label: 'Ajustes', icon: '⚙️', adminOnly: true },
+  { file: 'apis.html', label: 'APIs', icon: '🔌' },
+  { file: 'manual.html', label: 'Manual', icon: '📖' },
+  { file: 'contact.html', label: 'Contacto', icon: '✉️' },
+  { file: 'about.html', label: 'Acerca de', icon: 'ℹ️' },
 ];
+
+function currentPage() {
+  return location.pathname.split('/').pop() || 'index.html';
+}
+
+function buildBrand() {
+  return el('a', { class: 'brand brand--link', href: 'index.html', title: 'Ir al inicio' },
+    el('span', { class: 'brand__logo', 'aria-hidden': 'true', text: '🛏️' }),
+    el('div', { class: 'brand__text' },
+      el('strong', { text: CONFIG.APP_BRAND }),
+      el('small', { text: CONFIG.APP_NAME })),
+  );
+}
+
+// Interruptor de tema (claro/oscuro) con texto descriptivo. Se monta tanto en
+// la barra de la landing (sin sesión) como en la barra autenticada, de modo que
+// el modo nocturno sea global desde el inicio.
+function buildThemeToggle() {
+  const input = el('input', {
+    type: 'checkbox',
+    class: 'theme-switch__input',
+    'aria-label': 'Modo nocturno',
+    onchange: () => {
+      toggleTheme();
+      input.checked = currentTheme() === 'dark';
+    },
+  });
+  input.checked = currentTheme() === 'dark';
+  const label = el('label', {
+    class: 'theme-switch',
+    title: 'Modo nocturno (tema oscuro)',
+  }, input, el('span', { class: 'theme-switch__slider' }));
+  return el('span', { class: 'theme-control' },
+    label,
+    el('span', { class: 'theme-control__text', text: 'Modo nocturno' }));
+}
 
 export function renderNavbar(container) {
   const header = el('header', { class: 'navbar' });
 
-  // --- Top row ----------------------------------------------------------
-  const brand = el('div', { class: 'brand' },
-    el('span', { class: 'brand__logo', 'aria-hidden': 'true', text: '🛏️' }),
-    el('div', { class: 'brand__text' },
-      el('strong', { text: CONFIG.APP_NAME }),
-      el('small', { text: CONFIG.APP_SHORT })),
+  // --- Barra de la landing (sin sesión): solo acceso y registro --------------
+  const landingBar = el('header', { class: 'navbar' },
+    el('div', { class: 'navbar__top' },
+      buildBrand(),
+      el('div', { class: 'navbar__actions' },
+        buildThemeToggle(),
+        el('a', { class: 'btn btn--ghost btn--sm', href: 'login.html', text: 'Iniciar sesión' }),
+        el('a', { class: 'btn btn--primary btn--sm', href: 'registro.html', text: 'Registrarse' }),
+      ),
+    ),
   );
+
+  // --- Fila superior ---------------------------------------------------------
+  const brand = buildBrand();
 
   const deviceSelect = el('select', {
     id: 'device-select',
@@ -44,23 +88,13 @@ export function renderNavbar(container) {
     onchange: onDeviceChange,
   });
 
-  const themeInput = el('input', {
-    type: 'checkbox',
-    id: 'theme-switch',
-    class: 'theme-switch__input',
-    onchange: () => toggleTheme(),
-  });
-  themeInput.checked = currentTheme() === 'dark';
-  const themeSwitch = el('label', { class: 'theme-switch', title: 'Cambiar tema claro/oscuro' },
-    themeInput,
-    el('span', { class: 'theme-switch__slider' }),
-  );
+  const themeSwitch = buildThemeToggle();
 
   const connDot = el('span', { class: 'conn-dot' });
   const connText = el('span', { class: 'conn-text', text: 'Conectando…' });
   const connStatus = el('div', { class: 'conn-status', id: 'conn-status' }, connDot, connText);
 
-  const userBadge = el('div', { class: 'user-badge', id: 'user-badge' });
+  const userBadge = el('a', { class: 'user-badge user-badge--link', id: 'user-badge', href: 'profile.html', title: 'Ver perfil' });
 
   const logoutBtn = el('button', {
     class: 'btn btn--ghost btn--sm',
@@ -82,8 +116,11 @@ export function renderNavbar(container) {
     },
   });
 
+  const deviceSelectWrap = el('div', { class: 'device-select-wrap' },
+    el('label', { class: 'visually-hidden', for: 'device-select', text: 'Dispositivo' }), deviceSelect);
+
   const actions = el('div', { class: 'navbar__actions' },
-    el('div', { class: 'device-select-wrap' }, el('label', { class: 'visually-hidden', for: 'device-select', text: 'Dispositivo' }), deviceSelect),
+    ...(CONFIG.SHOW_DEVICE_SELECTOR ? [deviceSelectWrap] : []),
     themeSwitch,
     connStatus,
     userBadge,
@@ -93,13 +130,13 @@ export function renderNavbar(container) {
 
   const topRow = el('div', { class: 'navbar__top' }, brand, actions);
 
-  // --- Nav links ----------------------------------------------------------
+  // --- Enlaces de navegación ------------------------------------------------
   const nav = el('nav', { class: 'navbar__nav', id: 'nav-links', 'aria-label': 'Navegación principal' });
 
   header.append(topRow, nav);
-  container.replaceChildren(header);
+  container.replaceChildren(landingBar, header);
 
-  // --- State-driven updates ------------------------------------------------
+  // --- Actualizaciones por estado -------------------------------------------
   let ticker = null;
 
   function renderLinks(user) {
@@ -108,7 +145,7 @@ export function renderNavbar(container) {
       ...links.map((l) =>
         el('a', {
           class: 'nav-link',
-          href: `#${l.path}`,
+          href: l.file,
           'data-nav': '',
         }, el('span', { class: 'nav-link__icon', 'aria-hidden': 'true', text: l.icon }), el('span', { text: l.label })),
       ),
@@ -122,15 +159,20 @@ export function renderNavbar(container) {
       return;
     }
     const initials = (user.name || user.username || '?').split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+    const avatar = user.photo
+      ? el('img', { class: 'user-badge__avatar user-badge__avatar--img', src: user.photo, alt: '', width: '30', height: '30' })
+      : el('span', { class: 'user-badge__avatar', text: initials });
+    const subtitle = user.email || (isAdmin(user) ? 'Administrador' : 'Cliente / Cuidador');
     userBadge.replaceChildren(
-      el('span', { class: 'user-badge__avatar', text: initials }),
+      avatar,
       el('span', { class: 'user-badge__meta' },
-        el('strong', { text: user.name || user.username }),
-        el('small', { text: isAdmin(user) ? 'Administrador' : 'Cliente / Cuidador' })),
+        el('strong', { text: user.username }),
+        el('small', { text: subtitle })),
     );
   }
 
   function renderDeviceOptions(devices, selected) {
+    if (!CONFIG.SHOW_DEVICE_SELECTOR) return;
     const list = devices?.length ? devices : [];
     deviceSelect.replaceChildren(
       el('option', { value: '', text: 'Sin dispositivos', disabled: true, hidden: true, selected: true }),
@@ -164,20 +206,26 @@ export function renderNavbar(container) {
   }
 
   function updateActiveLink() {
+    const current = currentPage();
     nav.querySelectorAll('[data-nav]').forEach((a) => {
-      a.classList.toggle('active', a.getAttribute('href') === location.hash);
+      a.classList.toggle('active', a.getAttribute('href') === current);
     });
+  }
+
+  function renderVisibility(user) {
+    landingBar.hidden = !!user;
+    header.hidden = !user;
   }
 
   function onStore(state, patch) {
     const user = state.user;
-    header.hidden = !user;
+    renderVisibility(user);
     if (user) {
       if ('user' in patch) renderLinks(user);
       if ('user' in patch) renderBadge(user);
       if ('devices' in patch || 'deviceId' in patch) renderDeviceOptions(state.devices, state.deviceId);
       if ('devices' in patch && !state.deviceId && state.devices?.length) {
-        // First load: adopt the first online device (or the first device).
+        // Primera carga: adoptar el primer dispositivo en línea (o el primero).
         const first = state.devices.find((d) => d.online) || state.devices[0];
         if (first) onDeviceChange({ target: { value: first.id } });
       }
@@ -201,20 +249,18 @@ export function renderNavbar(container) {
     logout();
     poller.stopPoller();
     setState({ user: null, devices: [], lastReading: null, alerts: [], connectionStatus: 'connecting' });
-    location.hash = '#/login';
+    location.href = 'index.html';
   }
 
   const unsubscribe = subscribe(onStore);
-  const onHash = () => updateActiveLink();
-  window.addEventListener('hashchange', onHash);
   ticker = setInterval(updateConn, 1000);
 
-  // Initial paint.
+  // Pintado inicial.
   const st = getState();
   onStore(st, { user: st.user, devices: st.devices, deviceId: st.deviceId });
   updateConn();
 
-  // Pre-select a persisted device once devices load.
+  // Pre-seleccionar un dispositivo persistido una vez carguen los dispositivos.
   if (!st.deviceId) {
     try {
       const saved = localStorage.getItem(DEVICE_KEY);
@@ -226,7 +272,6 @@ export function renderNavbar(container) {
 
   return () => {
     unsubscribe();
-    window.removeEventListener('hashchange', onHash);
     clearInterval(ticker);
   };
 }

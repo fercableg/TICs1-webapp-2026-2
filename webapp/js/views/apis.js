@@ -2,11 +2,12 @@
 // apis.js — API reference: the PostgREST/Supabase endpoints this app consumes,
 // plus ready-to-use ESP32 (Arduino C++) snippets for the firmware side of the
 // workflow. Purely informational (no store subscription, no network calls).
+// El esqueleto (cards y <pre>) vive en apis.html; aquí se inyectan los bloques
+// de código y las tarjetas de endpoint.
 // ============================================================================
 
 import { el } from '../core/dom.js';
 import { CONFIG } from '../config.js';
-import { pageHeader, card } from './helpers.js';
 
 function methodBadge(method) {
   return el('span', { class: `method-badge method-badge--${method.toLowerCase()}`, text: method });
@@ -129,70 +130,25 @@ Cabeceras obligatorias en TODAS las peticiones:
   Content-Type:    application/json
   Prefer:          return=representation   (solo en PATCH)`;
 
-export function render(container) {
-  const root = el('div', { class: 'page' },
-    pageHeader('APIs', 'Endpoints del backend (Supabase / PostgREST) y código listo para el ESP32.'),
-    card('Cómo conectarse',
-      el('div', {},
-        el('p', {}, 'Toda la red de la interfaz pasa por `apiClient.js`. Para apuntar al backend real, pon `CONFIG.USE_MOCK_DATA = false` y rellena `API_BASE_URL` y `SUPABASE_ANON_KEY` en `config.js`.'),
-        el('p', { class: 'muted' }, 'La anon-key de Supabase es pública por diseño; el control de acceso fino se hace con políticas de fila (RLS).'),
-        code(HEADERS_NOTE))),
+export function init(root) {
+  const headers = root.querySelector('#apis-headers');
+  const esp32 = root.querySelector('#apis-esp32');
+  const web = root.querySelector('#apis-web');
 
-    card('Firmware → servidor (ESP32)',
-      el('div', {},
-        endpointCard({
-          method: 'POST',
-          path: '/readings',
-          scope: 'esp32',
-          description: 'Envía una lectura de los 6 sensores de presión más temperatura y humedad.',
-          snippet: ESP32_POST_READING,
-        }),
-        endpointCard({
-          method: 'GET',
-          path: '/settings?device_id=eq.{id}&limit=1',
-          scope: 'esp32',
-          description: 'Obtiene la configuración actual (umbrales, intervalos) para aplicarla sin reflashear.',
-          snippet: ESP32_GET_SETTINGS,
-        }),
-        endpointCard({
-          method: 'POST',
-          path: '/position_events',
-          scope: 'esp32',
-          description: 'Registra un cambio de posición detectado por el firmware.',
-          snippet: ESP32_POST_POSITION,
-        }))),
+  headers.textContent = HEADERS_NOTE;
 
-    card('Servidor → interfaz (Web)',
-      el('div', {},
-        endpointCard({
-          method: 'GET',
-          path: '/readings?device_id=eq.{id}&order=ts.desc&limit={n}',
-          scope: 'web',
-          description: 'Lee las últimas lecturas (historial y tendencias).',
-          snippet: GET_READINGS,
-        }),
-        endpointCard({
-          method: 'GET',
-          path: '/devices?select=*&order=last_seen.desc',
-          scope: 'web',
-          description: 'Lista los dispositivos registrados (selector de la navbar).',
-          snippet: GET_DEVICES,
-        }),
-        endpointCard({
-          method: 'GET',
-          path: '/alerts?device_id=eq.{id}&ack=is.false&order=ts.desc',
-          scope: 'web',
-          description: 'Lista las alertas activas (sin confirmar).',
-          snippet: GET_ALERTS,
-        }),
-        endpointCard({
-          method: 'PATCH',
-          path: '/alerts?id=eq.{id}',
-          scope: 'web',
-          description: 'Confirma una alerta (ACK): marca ack, ack_by y ack_ts.',
-          snippet: PATCH_ALERT,
-        }))),
+  esp32.replaceChildren(
+    endpointCard({ method: 'POST', path: '/readings', scope: 'esp32', description: 'Envía una lectura de los 6 sensores de presión más temperatura y humedad.', snippet: ESP32_POST_READING }),
+    endpointCard({ method: 'GET', path: '/settings?device_id=eq.{id}&limit=1', scope: 'esp32', description: 'Obtiene la configuración actual (umbrales, intervalos) para aplicarla sin reflashear.', snippet: ESP32_GET_SETTINGS }),
+    endpointCard({ method: 'POST', path: '/position_events', scope: 'esp32', description: 'Registra un cambio de posición detectado por el firmware.', snippet: ESP32_POST_POSITION }),
   );
-  container.replaceChildren(root);
+
+  web.replaceChildren(
+    endpointCard({ method: 'GET', path: '/readings?device_id=eq.{id}&order=ts.desc&limit={n}', scope: 'web', description: 'Lee las últimas lecturas (historial y tendencias).', snippet: GET_READINGS }),
+    endpointCard({ method: 'GET', path: '/devices?select=*&order=last_seen.desc', scope: 'web', description: 'Lista los dispositivos registrados (selector de la navbar).', snippet: GET_DEVICES }),
+    endpointCard({ method: 'GET', path: '/alerts?device_id=eq.{id}&ack=is.false&order=ts.desc', scope: 'web', description: 'Lista las alertas activas (sin confirmar).', snippet: GET_ALERTS }),
+    endpointCard({ method: 'PATCH', path: '/alerts?id=eq.{id}', scope: 'web', description: 'Confirma una alerta (ACK): marca ack, ack_by y ack_ts.', snippet: PATCH_ALERT }),
+  );
+
   return () => {};
 }

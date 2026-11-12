@@ -1,5 +1,6 @@
 // ============================================================================
-// history.js — Historical readings, filterable by date range, with CSV export.
+// history.js — Lecturas históricas con filtro por rango de fechas y export CSV.
+// El esqueleto (filtros, canvas y tabla) vive en history.html; aquí se hidrata.
 // ============================================================================
 
 import { el } from '../core/dom.js';
@@ -7,7 +8,7 @@ import { getState, subscribe } from '../services/store.js';
 import { CONFIG, POSTURES, SENSORS } from '../config.js';
 import { fmtTime, totalPressure, downloadCSV } from '../core/utils.js';
 import { LineChart, cssVar } from '../core/chart.js';
-import { pageHeader, card, emptyState, readingTimeLabel } from './helpers.js';
+import { emptyState, readingTimeLabel } from './helpers.js';
 import * as api from '../services/apiClient.js';
 import { toast } from '../core/ui.js';
 
@@ -17,40 +18,23 @@ function toLocalInput(ms) {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
-export function render(container) {
-  const fromInput = el('input', { type: 'datetime-local', class: 'input', value: toLocalInput(Date.now() - 6 * 60 * 60 * 1000) });
-  const toInput = el('input', { type: 'datetime-local', class: 'input', value: toLocalInput(Date.now()) });
+export function init(root) {
+  const fromInput = root.querySelector('#hist-from');
+  const toInput = root.querySelector('#hist-to');
+  const applyBtn = root.querySelector('#hist-apply');
+  const exportBtn = root.querySelector('#hist-export');
+  const countNote = root.querySelector('#hist-count');
+  const tableBody = root.querySelector('#hist-body');
+  const chartCanvas = root.querySelector('#hist-chart');
 
-  const tableBody = el('tbody');
-  const chartCanvas = el('canvas', { class: 'chart', style: 'height:220px' });
+  fromInput.value = toLocalInput(Date.now() - 6 * 60 * 60 * 1000);
+  toInput.value = toLocalInput(Date.now());
+
   const chart = new LineChart(chartCanvas, { height: 220 });
   let lastRows = [];
 
-  const countNote = el('p', { class: 'muted' });
-
-  const root = el('div', { class: 'page' },
-    pageHeader('Historial', 'Consulta las lecturas históricas del dispositivo y exporta a CSV.'),
-    card('Filtro de fechas',
-      el('div', { class: 'form-row' },
-        el('div', { class: 'field' }, el('label', { for: 'from', text: 'Desde' }), fromInput),
-        el('div', { class: 'field' }, el('label', { for: 'to', text: 'Hasta' }), toInput),
-        el('div', { class: 'field field--grow' },
-          el('button', { class: 'btn btn--primary', type: 'button', text: 'Aplicar', onclick: apply }),
-          el('button', { class: 'btn btn--outline', type: 'button', text: 'Exportar CSV', onclick: exportCSV }))),
-      countNote),
-    card('Tendencia de presión', chartCanvas),
-    card('Registros',
-      el('div', { class: 'table-wrap' },
-        el('table', { class: 'table' },
-          el('thead', {}, el('tr', {},
-            el('th', { text: 'Hora' }),
-            el('th', { text: 'Postura' }),
-            ...SENSORS.map((s) => el('th', { text: s.key, title: s.name })),
-            el('th', { text: 'Temp' }),
-            el('th', { text: 'Hum' }))),
-          tableBody))),
-  );
-  container.replaceChildren(root);
+  applyBtn.addEventListener('click', apply);
+  exportBtn.addEventListener('click', exportCSV);
 
   async function apply() {
     const from = new Date(fromInput.value).getTime();
@@ -109,7 +93,7 @@ export function render(container) {
     toast('CSV exportado.', 'success');
   }
 
-  // Re-apply the current filter when the selected device changes.
+  // Re-aplicar el filtro actual cuando cambia el dispositivo seleccionado.
   const unsubscribe = subscribe((_state, patch) => {
     if ('deviceId' in patch) apply();
   });

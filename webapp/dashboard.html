@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="Panel de control en vivo del colchón seleccionado." />
+  <title>Panel · Monitoreo de Colchón Inteligente</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/views.css" />
+</head>
+<body data-view="dashboard">
+  <div id="navbar-root"></div>
+
+  <main id="view-root" class="view-root">
+    <div class="page">
+      <div class="page-header">
+        <h1>Panel</h1>
+        <p class="page-subtitle">Resumen en vivo del colchón seleccionado.</p>
+      </div>
+
+      <div id="dash-status" class="status-banner" hidden></div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-card__label">Postura actual</div>
+          <div class="stat-card__value"><span id="dash-posture" class="badge badge--posture">—</span></div>
+          <div class="stat-card__icon" aria-hidden="true">🛏️</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Temperatura</div>
+          <div class="stat-card__value"><strong id="dash-temp">—</strong><span class="stat-card__unit">°C</span></div>
+          <div class="stat-card__icon" aria-hidden="true">🌡️</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Humedad</div>
+          <div class="stat-card__value"><strong id="dash-hum">—</strong><span class="stat-card__unit">%</span></div>
+          <div class="stat-card__icon" aria-hidden="true">💧</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Presión total</div>
+          <div class="stat-card__value"><strong id="dash-total">—</strong></div>
+          <div class="stat-card__icon" aria-hidden="true">⚖️</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Última lectura</div>
+          <div class="stat-card__value"><strong id="dash-seen">—</strong></div>
+          <div class="stat-card__icon" aria-hidden="true">📡</div>
+        </div>
+      </div>
+
+      <div class="grid grid--2">
+        <section class="card">
+          <header class="card__header"><h2>Tendencia de presión</h2></header>
+          <div class="card__body"><canvas id="dash-pressure" class="chart" style="height:220px"></canvas></div>
+        </section>
+        <section class="card">
+          <header class="card__header"><h2>Alertas activas</h2></header>
+          <div class="card__body">
+            <div id="dash-alerts" class="alert-list"></div>
+            <a class="link" href="alerts.html">Ver todas las alertas →</a>
+          </div>
+        </section>
+      </div>
+
+      <div class="grid grid--2">
+        <section class="card">
+          <header class="card__header"><h2>Temperatura (°C)</h2></header>
+          <div class="card__body"><canvas id="dash-temp-chart" class="chart" style="height:150px"></canvas></div>
+        </section>
+        <section class="card">
+          <header class="card__header"><h2>Humedad relativa (%)</h2></header>
+          <div class="card__body"><canvas id="dash-hum-chart" class="chart" style="height:150px"></canvas></div>
+        </section>
+      </div>
+
+      <section class="card">
+        <header class="card__header"><h2>Intervalo de sondeo</h2></header>
+        <div class="card__body">
+          <div class="inline-control">
+            <span>Actualizar cada</span>
+            <select id="dash-poll" class="select" aria-label="Intervalo de sondeo">
+              <option value="2">2 s</option>
+              <option value="3">3 s</option>
+              <option value="4">4 s</option>
+              <option value="5">5 s</option>
+              <option value="10">10 s</option>
+            </select>
+            <span class="muted">(el panel se refresca automáticamente)</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <noscript>
+    <p class="noscript">Esta aplicación requiere JavaScript para funcionar. Habilítalo y recarga la página.</p>
+  </noscript>
+
+  <script type="module" src="js/app-shell.js"></script>
+  <script type="module" src="js/page.js"></script>
+</body>
+</html>

@@ -1,34 +1,21 @@
 // ============================================================================
-// settings.js — ADMIN ONLY. Initial configuration (shared settings form) plus a
-// read-only device management table. The same form is also surfaced in the
-// Monitoreo view for live tuning; see settingsForm.js.
+// settings.js — SOLO ADMINISTRADOR. Configuración inicial (formulario
+// compartido) + tabla de dispositivos de solo lectura. El esqueleto vive en
+// settings.html; aquí se monta el formulario y se hidrata la tabla.
 // ============================================================================
 
 import { el } from '../core/dom.js';
 import { getState, subscribe } from '../services/store.js';
 import { fmtDateTime } from '../core/utils.js';
-import { pageHeader, card, emptyState } from './helpers.js';
+import { emptyState } from './helpers.js';
 import { renderSettingsForm } from './settingsForm.js';
 
-export function render(container) {
+export function init(root) {
+  const formMount = root.querySelector('#settings-form');
+  const deviceTableBody = root.querySelector('#settings-devices-body');
+
   const sf = renderSettingsForm();
-
-  const deviceTableBody = el('tbody');
-
-  const root = el('div', { class: 'page' },
-    pageHeader('Ajustes', 'Configuración del dispositivo y del paciente (solo administradores).'),
-    card('Configuración', sf.node),
-    card('Gestión de dispositivos',
-      el('div', { class: 'table-wrap' },
-        el('table', { class: 'table' },
-          el('thead', {}, el('tr', {},
-            el('th', { text: 'ID' }),
-            el('th', { text: 'Nombre' }),
-            el('th', { text: 'Estado' }),
-            el('th', { text: 'Última lectura' }))),
-          deviceTableBody))),
-  );
-  container.replaceChildren(root);
+  formMount.replaceChildren(sf.node);
 
   function renderDevices() {
     const devices = getState().devices || [];

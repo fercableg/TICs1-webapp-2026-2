@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="Mapa de presión por zona y lecturas en vivo de los 6 sensores FSR406." />
+  <title>Monitoreo · Monitoreo de Colchón Inteligente</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/views.css" />
+</head>
+<body data-view="monitoreo">
+  <div id="navbar-root"></div>
+
+  <main id="view-root" class="view-root">
+    <div class="page">
+      <div class="page-header">
+        <h1>Monitoreo</h1>
+        <p class="page-subtitle">Mapa de presión por zona instrumentada (6 sensores FSR406).</p>
+      </div>
+
+      <div id="monitoreo-empty" class="status-banner status-banner--info" hidden>Cama vacía: presión total bajo el umbral.</div>
+
+      <section class="card">
+        <header class="card__header"><h2>Mapa de presión</h2></header>
+        <div class="card__body">
+          <div class="bed-map">
+            <div class="bed-map__body" aria-hidden="true"></div>
+            <!-- Las 6 celdas de presión se inyectan desde monitoreo.js (SENSORS). -->
+          </div>
+          <div class="legend">
+            <span class="legend__label">Baja</span>
+            <div class="legend__bar"></div>
+            <span class="legend__label">Alta</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <header class="card__header"><h2>Lecturas por sensor</h2></header>
+        <div class="card__body">
+          <div class="sensor-grid"><!-- Las 6 tarjetas se inyectan desde monitoreo.js. --></div>
+        </div>
+      </section>
+
+      <p class="muted">Los valores corresponden a lecturas relativas del conversor ADC (0–4095); no son mediciones clínicas de presión tisular.</p>
+
+      <section class="card" id="monitoreo-settings" hidden>
+        <header class="card__header"><h2>Configuración en tiempo real</h2></header>
+        <div class="card__body">
+          <p class="muted">Ajusta umbrales, detección de alertas y muestreo sin pasar por el Arduino IDE. Los cambios se aplican al instante.</p>
+          <div id="monitoreo-settings-form"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <noscript>
+    <p class="noscript">Esta aplicación requiere JavaScript para funcionar. Habilítalo y recarga la página.</p>
+  </noscript>
+
+  <script type="module" src="js/app-shell.js"></script>
+  <script type="module" src="js/page.js"></script>
+</body>
+</html>

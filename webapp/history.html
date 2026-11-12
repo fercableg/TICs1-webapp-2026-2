@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="Lecturas históricas del dispositivo con filtro por rango de fechas y exportación CSV." />
+  <title>Historial · Monitoreo de Colchón Inteligente</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/views.css" />
+</head>
+<body data-view="history">
+  <div id="navbar-root"></div>
+
+  <main id="view-root" class="view-root">
+    <div class="page">
+      <div class="page-header">
+        <h1>Historial</h1>
+        <p class="page-subtitle">Consulta las lecturas históricas del dispositivo y exporta a CSV.</p>
+      </div>
+
+      <section class="card">
+        <header class="card__header"><h2>Filtro de fechas</h2></header>
+        <div class="card__body">
+          <div class="form-row">
+            <div class="field"><label for="hist-from">Desde</label><input id="hist-from" type="datetime-local" class="input" /></div>
+            <div class="field"><label for="hist-to">Hasta</label><input id="hist-to" type="datetime-local" class="input" /></div>
+            <div class="field field--grow">
+              <button id="hist-apply" class="btn btn--primary" type="button">Aplicar</button>
+              <button id="hist-export" class="btn btn--outline" type="button">Exportar CSV</button>
+            </div>
+          </div>
+          <p id="hist-count" class="muted"></p>
+        </div>
+      </section>
+
+      <section class="card">
+        <header class="card__header"><h2>Tendencia de presión</h2></header>
+        <div class="card__body"><canvas id="hist-chart" class="chart" style="height:220px"></canvas></div>
+      </section>
+
+      <section class="card">
+        <header class="card__header"><h2>Registros</h2></header>
+        <div class="card__body">
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Hora</th>
+                  <th>Postura</th>
+                  <th title="Occipital">p1</th>
+                  <th title="Escápula izquierda">p2</th>
+                  <th title="Escápula derecha">p3</th>
+                  <th title="Sacro">p4</th>
+                  <th title="Talón izquierdo">p5</th>
+                  <th title="Talón derecho">p6</th>
+                  <th>Temp</th>
+                  <th>Hum</th>
+                </tr>
+              </thead>
+              <tbody id="hist-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <noscript>
+    <p class="noscript">Esta aplicación requiere JavaScript para funcionar. Habilítalo y recarga la página.</p>
+  </noscript>
+
+  <script type="module" src="js/app-shell.js"></script>
+  <script type="module" src="js/page.js"></script>
+</body>
+</html>

@@ -1,83 +1,64 @@
 // ============================================================================
-// monitoreo.js — Visual pressure map of the 6 FSR zones (p1..p6) + live
-// readings + an inline configuration panel (admin only) so thresholds and
-// alert detection can be tuned at runtime without reflashing the ESP32.
+// monitoreo.js — Mapa de presión visual de las 6 zonas FSR (p1..p6) + lecturas
+// en vivo + panel de configuración (solo administrador). El esqueleto (cards,
+// leyenda y el panel de configuración) vive en monitoreo.html; aquí se generan
+// las celdas del mapa y las tarjetas por sensor desde SENSORS y se hidratan.
 // ============================================================================
 
 import { el } from '../core/dom.js';
 import { getState, subscribe } from '../services/store.js';
 import { CONFIG, SENSORS } from '../config.js';
 import { totalPressure, safeNum } from '../core/utils.js';
-import { pageHeader, card, pressureColor } from './helpers.js';
+import { pressureColor } from './helpers.js';
 import { renderSettingsForm } from './settingsForm.js';
 import { isAdmin } from '../services/auth.js';
 
-export function render(container) {
-  const emptyBanner = el('div', { class: 'status-banner status-banner--info', hidden: true, text: 'Cama vacía: presión total bajo el umbral.' });
+export function init(root) {
+  const emptyBanner = root.querySelector('#monitoreo-empty');
+  const map = root.querySelector('.bed-map');
+  const detailGrid = root.querySelector('.sensor-grid');
+  const settingsCard = root.querySelector('#monitoreo-settings');
+  const settingsFormMount = root.querySelector('#monitoreo-settings-form');
 
-  // Build the pressure-map cells (positioned over a stylised mattress).
+  // --- Celdas del mapa de presión (posicionadas sobre el colchón estilizado).
   const cells = {};
-  const map = el('div', { class: 'bed-map' },
-    el('div', { class: 'bed-map__body', 'aria-hidden': 'true' }),
-    ...SENSORS.map((z) => {
-      const value = el('span', { class: 'bed-cell__value', text: '—' });
-      const cell = el('div', {
-        class: 'bed-cell',
-        style: `left:${z.x}%;top:${z.y}%`,
-        dataset: { key: z.key },
-      },
-      el('span', { class: 'bed-cell__label', text: z.name }),
-      value,
-      el('span', { class: 'bed-cell__key', text: z.key }));
-      cells[z.key] = { cell, value };
-      return cell;
-    }),
-  );
-
-  // Sensor detail cards (numeric readout + intensity bar).
-  const bars = {};
-  const detailGrid = el('div', { class: 'sensor-grid' },
-    ...SENSORS.map((z) => {
-      const bar = el('div', { class: 'sensor-bar__fill' });
-      const num = el('strong', { text: '—' });
-      bars[z.key] = { bar, num };
-      return el('div', { class: 'sensor-card' },
-        el('div', { class: 'sensor-card__head' },
-          el('span', { class: 'sensor-card__name', text: z.name }),
-          el('code', { text: z.key })),
-        num,
-        el('div', { class: 'sensor-bar' }, bar));
-    }),
-  );
-
-  const legend = el('div', { class: 'legend' },
-    el('span', { class: 'legend__label', text: 'Baja' }),
-    el('div', { class: 'legend__bar' }),
-    el('span', { class: 'legend__label', text: 'Alta' }),
-  );
-
-  // --- Configuration panel (admin only, same form as Ajustes) -----------------
-  const user = getState().user;
-  let settingsSection = null;
-  if (isAdmin(user)) {
-    const sf = renderSettingsForm();
-    settingsSection = { sf, node: card('Configuración en tiempo real', el('div', {},
-      el('p', { class: 'muted' }, 'Ajusta umbrales, detección de alertas y muestreo sin pasar por el Arduino IDE. Los cambios se aplican al instante.'),
-      sf.node)) };
+  for (const z of SENSORS) {
+    const value = el('span', { class: 'bed-cell__value', text: '—' });
+    const cell = el('div', {
+      class: 'bed-cell',
+      style: `left:${z.x}%;top:${z.y}%`,
+      dataset: { key: z.key },
+    },
+    el('span', { class: 'bed-cell__label', text: z.name }),
+    value,
+    el('span', { class: 'bed-cell__key', text: z.key }));
+    cells[z.key] = { cell, value };
+    map.appendChild(cell);
   }
 
-  const children = [
-    pageHeader('Monitoreo', `Mapa de presión por zona instrumentada (${SENSORS.length} sensores FSR406).`),
-    emptyBanner,
-    card('Mapa de presión', el('div', {}, map, legend)),
-    card('Lecturas por sensor', detailGrid),
-    el('p', { class: 'muted' },
-      'Los valores corresponden a lecturas relativas del conversor ADC (0–4095); no son mediciones clínicas de presión tisular.'),
-  ];
-  if (settingsSection) children.push(settingsSection.node);
+  // --- Tarjetas de detalle por sensor (lectura numérica + barra de intensidad).
+  const bars = {};
+  for (const z of SENSORS) {
+    const bar = el('div', { class: 'sensor-bar__fill' });
+    const num = el('strong', { text: '—' });
+    bars[z.key] = { bar, num };
+    detailGrid.appendChild(el('div', { class: 'sensor-card' },
+      el('div', { class: 'sensor-card__head' },
+        el('span', { class: 'sensor-card__name', text: z.name }),
+        el('code', { text: z.key })),
+      num,
+      el('div', { class: 'sensor-bar' }, bar)));
+  }
 
-  const root = el('div', { class: 'page' }, ...children);
-  container.replaceChildren(root);
+  // --- Panel de configuración (solo administrador, mismo formulario que Ajustes).
+  let settingsSection = null;
+  const user = getState().user;
+  if (isAdmin(user)) {
+    const sf = renderSettingsForm();
+    settingsFormMount.replaceChildren(sf.node);
+    settingsCard.hidden = false;
+    settingsSection = sf;
+  }
 
   function refresh() {
     const st = getState();
@@ -114,6 +95,6 @@ export function render(container) {
 
   return () => {
     unsubscribe();
-    if (settingsSection) settingsSection.sf.cleanup();
+    if (settingsSection) settingsSection.cleanup();
   };
 }

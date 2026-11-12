@@ -1,69 +1,44 @@
 // ============================================================================
-// alerts.js — Active / resolved alerts with severity + acknowledgment (ACK).
+// alerts.js — Alertas activas / resueltas con severidad y confirmación (ACK).
+// El esqueleto (tabs + dos tablas) vive en alerts.html; aquí se hidratan.
 // ============================================================================
 
 import { el } from '../core/dom.js';
 import { getState, subscribe } from '../services/store.js';
 import { fmtDateTime } from '../core/utils.js';
-import { pageHeader, card, severityBadge, emptyState } from './helpers.js';
+import { severityBadge, emptyState } from './helpers.js';
 import * as api from '../services/apiClient.js';
 import { toast } from '../core/ui.js';
 import * as poller from '../services/poller.js';
 
-export function render(container) {
-  const activeBody = el('tbody');
-  const resolvedBody = el('tbody');
-  const activePanel = el('div', {},
-    el('div', { class: 'table-wrap' },
-      el('table', { class: 'table' },
-        el('thead', {}, el('tr', {},
-          el('th', { text: 'Severidad' }),
-          el('th', { text: 'Mensaje' }),
-          el('th', { text: 'Fecha' }),
-          el('th', { text: 'Acción' }))),
-        activeBody)));
-  const resolvedPanel = el('div', {},
-    el('div', { class: 'table-wrap' },
-      el('table', { class: 'table' },
-        el('thead', {}, el('tr', {},
-          el('th', { text: 'Severidad' }),
-          el('th', { text: 'Mensaje' }),
-          el('th', { text: 'Fecha' }),
-          el('th', { text: 'Confirmada por' }))),
-        resolvedBody)));
-
-  const tabs = el('div', { class: 'tabs', role: 'tablist' },
-    el('button', { class: 'tab tab--active', role: 'tab', 'aria-selected': 'true', text: 'Activas', onclick: () => switchTab('active') }),
-    el('button', { class: 'tab', role: 'tab', 'aria-selected': 'false', text: 'Resueltas', onclick: () => switchTab('resolved') }),
-  );
-
-  const root = el('div', { class: 'page' },
-    pageHeader('Alertas', 'Alertas activas y resueltas del dispositivo. Las alertas son orientativas, no un diagnóstico.'),
-    card('', el('div', {}, tabs, activePanel)),
-  );
-  container.replaceChildren(root);
+export function init(root) {
+  const tabActive = root.querySelector('#tab-active');
+  const tabResolved = root.querySelector('#tab-resolved');
+  const activePanel = root.querySelector('#alerts-active-panel');
+  const resolvedPanel = root.querySelector('#alerts-resolved-panel');
+  const activeBody = root.querySelector('#alerts-active-body');
+  const resolvedBody = root.querySelector('#alerts-resolved-body');
 
   let currentTab = 'active';
   const resolvedCache = new Map();
 
   function switchTab(tab) {
     currentTab = tab;
-    root.querySelectorAll('.tab').forEach((t, i) => {
-      const isActive = (i === 0 && tab === 'active') || (i === 1 && tab === 'resolved');
-      t.classList.toggle('tab--active', isActive);
-      t.setAttribute('aria-selected', String(isActive));
-    });
-    activePanel.hidden = tab !== 'active';
-    resolvedPanel.hidden = tab !== 'resolved';
-    // Mount the resolved panel lazily on first switch.
-    if (tab === 'resolved' && !resolvedPanel.parentElement) {
-      root.querySelector('.card__body').appendChild(resolvedPanel);
-    }
+    const isActive = tab === 'active';
+    tabActive.classList.toggle('tab--active', isActive);
+    tabResolved.classList.toggle('tab--active', !isActive);
+    tabActive.setAttribute('aria-selected', String(isActive));
+    tabResolved.setAttribute('aria-selected', String(!isActive));
+    activePanel.hidden = !isActive;
+    resolvedPanel.hidden = isActive;
     if (tab === 'resolved') loadResolved();
   }
 
+  tabActive.addEventListener('click', () => switchTab('active'));
+  tabResolved.addEventListener('click', () => switchTab('resolved'));
+
   function renderActive(alerts) {
-    // Dedup by id — polling can deliver the same alert across cycles.
+    // Dedup por id — el sondeo puede entregar la misma alerta en ciclos.
     const byId = new Map((alerts || []).map((a) => [a.id, a]));
     const list = [...byId.values()].sort((a, b) => b.ts - a.ts);
     if (!list.length) {
@@ -107,8 +82,8 @@ export function render(container) {
     try {
       await api.ackAlert(alert.id, user?.username || 'admin');
       toast('Alerta confirmada.', 'success');
-      poller.pollNow(); // refresh active alerts in the store
-      loadResolved();    // move it into the resolved tab immediately
+      poller.pollNow(); // refresca las alertas activas en el store
+      loadResolved();    // la mueve al tab de resueltas de inmediato
     } catch (err) {
       toast(`No se pudo confirmar: ${err.message}`, 'error');
     }
@@ -133,10 +108,6 @@ export function render(container) {
 
   const unsubscribe = subscribe(onStore);
   renderActive(getState().alerts);
-
-  // Wire up the lazy resolved panel mount.
-  const body = root.querySelector('.card__body');
-  body.appendChild(activePanel);
 
   return () => unsubscribe();
 }

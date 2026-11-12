@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="Soporte técnico y reporte de incidencias." />
+  <title>Contacto · Monitoreo de Colchón Inteligente</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/views.css" />
+</head>
+<body data-view="contact">
+  <div id="navbar-root"></div>
+
+  <main id="view-root" class="view-root">
+    <div class="page page--narrow">
+      <div class="page-header">
+        <h1>Contacto</h1>
+        <p class="page-subtitle">Soporte técnico y reporte de incidencias.</p>
+      </div>
+
+      <section class="card">
+        <header class="card__header"><h2>Formulario de contacto</h2></header>
+        <div class="card__body">
+          <form id="contact-form" class="contact-form">
+            <div class="field"><label for="c-name">Nombre</label><input id="c-name" type="text" class="input" required /></div>
+            <div class="field"><label for="c-email">Correo electrónico</label><input id="c-email" type="email" class="input" required /></div>
+            <div class="field">
+              <label for="c-subject">Asunto</label>
+              <select id="c-subject" class="select">
+                <option value="consulta">Consulta general</option>
+                <option value="tecnico">Problema técnico</option>
+                <option value="sugerencia">Sugerencia</option>
+                <option value="otro">Otro</option>
+              </select>
+            </div>
+            <div class="field"><label for="c-message">Mensaje</label><textarea id="c-message" class="textarea" rows="5" required></textarea></div>
+            <button class="btn btn--primary" type="submit">Enviar mensaje</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="card">
+        <header class="card__header"><h2>Información de soporte</h2></header>
+        <div class="card__body">
+          <div class="contact-info">
+            <p><strong>Correo: </strong><a class="link" href="mailto:correo@mail.cl">correo@mail.cl</a></p>
+            <p><strong>Teléfono: </strong>+56 2 1234 5678</p>
+            <p><strong>Horario: </strong>Lunes a viernes, 9:00–18:00 hrs.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <noscript>
+    <p class="noscript">Esta aplicación requiere JavaScript para funcionar. Habilítalo y recarga la página.</p>
+  </noscript>
+
+  <script type="module" src="js/app-shell.js"></script>
+  <script type="module" src="js/page.js"></script>
+</body>
+</html>

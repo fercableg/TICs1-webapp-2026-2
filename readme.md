@@ -14,8 +14,7 @@ real, con alertas y recordatorios de cambio de posición.
 
 ## Stack
 
-HTML5 semántico con CSS3 y Vanilla JavaScript (ES Modules). Sin frameworks ni
-bundler: 100 % archivos estáticos, desplegables en Cloudflare Pages.
+HTML5 semántico con CSS3 y Vanilla JavaScript (ES Modules), desplegables en Cloudflare Pages.
 
 ## Ejecución local
 
@@ -60,22 +59,25 @@ Cada vista es una **página HTML real** con su esqueleto estático y un
 
 ```
 webapp/
-  index.html          # landing pública (hero + animación + CTA)
-  login.html, registro.html, profile.html, dashboard.html, …
-  css/                # tokens, base, componentes, vistas
+  index.html          
+  login.html 
+  registro.html
+  profile.html
+  dashboard.html
+  css/                
   js/
-    config.js         # CONFIG + SENSORS + catálogos (fuente de verdad)
-    app-shell.js      # bootstrap compartido: tema + UI + navbar + guard de auth
-    page.js           # lee body[data-view], importa views/<view>.js y llama init()
-    core/             # dom, ui, utils, chart
-    services/         # store, auth, theme, apiClient, mockData, poller
-    components/       # navbar
-    views/            # landing, login, registro, profile, dashboard, monitoreo, …
-scripts/              # smoke test + DOM shim + verificación con Chromium
+    config.js
+    app-shell.js
+    page.js
+    core/
+    services/
+    components/
+    views/       
+scripts/              
 ```
 
 ## Integrantes
 
-- **Fernando Cabrera Legue** — Jefe de proyecto.
-- **Cinthya Fuentealba Bravo** — Aplicación y comunicaciones.
-- **Gonzalo Letelier Muñoz** — Hardware y sensores.
+- **Fernando Cabrera Legue:** Jefe de proyecto.
+- **Cinthya Fuentealba Bravo:** — Aplicación y comunicaciones.
+- **Gonzalo Letelier Muñoz:** — Hardware y sensores.

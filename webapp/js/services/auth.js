@@ -2,6 +2,8 @@
 // auth.js — Frontend role-based access control (RBAC).
 //
 // Two roles: `admin` (full access) and `client` (caregiver — restricted view).
+// Solo existe una cuenta de demostración (admin). El resto de usuarios se
+// registran desde la página y quedan con rol `client` (nunca admin).
 // The session lives in sessionStorage (cleared when the tab closes). Theme and
 // device selection persist in localStorage (see theme.js / navbar.js).
 //
@@ -27,8 +29,7 @@ export const ROLES = {
 };
 
 export const DEMO_USERS = [
-  { username: 'admin', password: 'admin123', role: ROLES.ADMIN, name: 'Administrador', email: 'admin@bedsense.cl' },
-  { username: 'cliente', password: 'cliente123', role: ROLES.CLIENT, name: 'Cuidador/a', email: 'cliente@bedsense.cl' },
+  { username: 'admin', password: 'password', role: ROLES.ADMIN, name: 'Administrador', email: 'admin@bedsense.cl' },
 ];
 
 // Storage is wrapped so the module is also importable from a Node smoke test

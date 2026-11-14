@@ -7,7 +7,7 @@
 //   (a) falla si hubo errores de consola (`ERROR:CONSOLE` en stderr);
 //   (b) verifica la presencia de elementos clave en el DOM resultante;
 //   (c) verifica las redirecciones de autenticación (sin sesión → login;
-//       cliente → settings redirige a dashboard; login con sesión → dashboard).
+//       login con sesión → dashboard).
 //
 // Las páginas protegidas se cargan sembrando primero una sesión en
 // `sessionStorage` mediante `_seed_check.html` (mismo origen), que redirige a
@@ -170,12 +170,6 @@ async function run() {
   } catch (err) { fail('sin sesión, dashboard → login', err.message); }
 
   try {
-    const { dom } = await dump(seed('settings.html', 'client'));
-    assert(bodyDataView(dom) === 'dashboard', `cliente → settings redirige a dashboard, se obtuvo "${bodyDataView(dom)}"`);
-    ok('cliente, settings → dashboard (sin permisos)');
-  } catch (err) { fail('cliente, settings → dashboard', err.message); }
-
-  try {
     const { dom } = await dump(seed('login.html', 'admin'));
     assert(bodyDataView(dom) === 'dashboard', `con sesión, login → dashboard, se obtuvo "${bodyDataView(dom)}"`);
     ok('con sesión, login → dashboard');
@@ -205,8 +199,8 @@ async function run() {
       assert(dom.includes('id="dash-pressure"'), 'falta #dash-pressure');
     }],
     ['monitoreo.html', seed('monitoreo.html', 'admin'), (dom) => {
-      assert((dom.match(/class="bed-cell"/g) || []).length === 6, 'se esperaban 6 .bed-cell');
       assert((dom.match(/class="sensor-card"/g) || []).length === 6, 'se esperaban 6 .sensor-card');
+      assert((dom.match(/<canvas/g) || []).length === 6, 'se esperaban 6 <canvas> (uno por sensor)');
     }],
     ['positions.html', seed('positions.html', 'admin'), (dom) => {
       assert(dom.includes('id="positions-chips"'), 'falta #positions-chips');
@@ -219,10 +213,6 @@ async function run() {
     ['history.html', seed('history.html', 'admin'), (dom) => {
       assert(dom.includes('id="hist-chart"'), 'falta #hist-chart');
       assert(dom.includes('id="hist-body"'), 'falta #hist-body');
-    }],
-    ['settings.html', seed('settings.html', 'admin'), (dom) => {
-      assert(dom.includes('class="settings-form"') || dom.includes('id="settings-form"'), 'falta el formulario de ajustes');
-      assert(dom.includes('id="settings-devices-body"'), 'falta #settings-devices-body');
     }],
     ['apis.html', seed('apis.html', 'admin'), (dom) => {
       assert((dom.match(/class="endpoint"/g) || []).length >= 6, 'se esperaban >= 6 tarjetas de endpoint');

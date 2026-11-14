@@ -21,6 +21,48 @@ import * as mock from './mockData.js';
 
 const REQUEST_TIMEOUT_MS = 8000;
 
+// Supabase guarda/entrega las columnas `timestamptz` como cadenas ISO 8601,
+// pero la app trata las fechas como epoch-milliseconds (aritmética con
+// Date.now(), timeAgo(), etiquetas de gráficos). Estos helpers convierten en la
+// frontera de apiClient para que el resto del código no vea ISO ni envíe
+// números crudos a PostgREST.
+const TS_FIELDS = ['ts', 'timestamp', 'last_seen', 'ack_ts', 'updated_at'];
+
+function toEpochMs(value) {
+  if (value == null) return value;
+  if (typeof value === 'number') return value;
+  const ms = Date.parse(value);
+  return Number.isNaN(ms) ? value : ms;
+}
+
+function toIsoString(value) {
+  if (value == null) return value;
+  if (typeof value === 'number') return new Date(value).toISOString();
+  return value;
+}
+
+function mapObject(obj, mapper) {
+  const out = {};
+  for (const [k, v] of Object.entries(obj)) {
+    out[k] = TS_FIELDS.includes(k) ? mapper(v) : v;
+  }
+  return out;
+}
+
+// Respuestas: ISO string → epoch ms.
+function normalize(data) {
+  if (Array.isArray(data)) return data.map(normalize);
+  if (data && typeof data === 'object') return mapObject(data, toEpochMs);
+  return data;
+}
+
+// Requests: epoch ms → ISO string.
+function serialize(data) {
+  if (Array.isArray(data)) return data.map(serialize);
+  if (data && typeof data === 'object') return mapObject(data, toIsoString);
+  return data;
+}
+
 export class ApiError extends Error {
   constructor(message, status = 0, isTimeout = false) {
     super(message);
@@ -53,14 +95,14 @@ async function supabaseFetch(path, { method = 'GET', body, query = '' } = {}) {
         'Content-Type': 'application/json',
         ...(method === 'PATCH' ? { Prefer: 'return=representation' } : {}),
       },
-      body: body ? JSON.stringify(body) : undefined,
+      body: body ? JSON.stringify(serialize(body)) : undefined,
       signal: controller.signal,
     });
     if (!res.ok) {
       throw new ApiError(`Error del servidor (HTTP ${res.status}).`, res.status);
     }
     const text = await res.text();
-    return text ? JSON.parse(text) : null;
+    return text ? normalize(JSON.parse(text)) : null;
   } catch (err) {
     if (err.name === 'AbortError') {
       throw new ApiError('La solicitud excedió el tiempo de espera.', 0, true);

@@ -36,7 +36,7 @@ el servidor de Python no envía cabeceras `no-cache`.
 ```bash
 npm run check    # node --check sobre todos los módulos JS
 npm run smoke    # smoke test de Node (imports, config, utils, store, RBAC, API, poller)
-node scripts/check-pages.mjs   # Chromium headless: carga las 14 páginas + redirecciones de auth
+node scripts/check-pages.mjs   # Chromium headless: carga las 13 páginas + redirecciones de auth
 ```
 
 ## Vistas (multi-page)
@@ -46,12 +46,11 @@ Cada vista es una **página HTML real** con su esqueleto estático y un
 
 `index.html` (landing pública) · `login.html` · `registro.html` ·
 `profile.html` (perfil) · `dashboard.html` · `monitoreo.html` ·
-`positions.html` · `alerts.html` · `history.html` · `settings.html`
-(solo administrador) · `apis.html` · `manual.html` · `contact.html` ·
-`about.html`
+`positions.html` · `alerts.html` · `history.html` · `apis.html` ·
+`manual.html` · `contact.html` · `about.html`
 
-> Las cuentas demo `admin` / `admin123` y `cliente` / `cliente123` siguen
-> siendo válidas para iniciar sesión, pero ya no se muestran en la interfaz.
+> Solo existe la cuenta demo `admin` / `password` (acceso total); no se muestra
+> en la interfaz. El resto de usuarios se registran desde `registro.html`.
 > La landing page termina con una llamada a la acción que redirige a
 > `login.html` y `registro.html` (igual que la barra superior).
 

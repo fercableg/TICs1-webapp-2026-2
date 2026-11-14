@@ -3,8 +3,8 @@
 //
 // Se usa en las vistas `/login` y `/registro`. Los botones de alternancia
 // navegan a la otra ruta en lugar de cambiar el formulario en el mismo lugar.
-// Los usuarios de demostración (admin / cliente) siguen siendo válidos en
-// auth.js, pero ya NO se muestran en la interfaz.
+// Solo existe una cuenta de demostración (`admin`) en auth.js; no se muestra
+// en la interfaz. El resto de usuarios se registran desde esta misma página.
 // ============================================================================
 
 import { el } from '../core/dom.js';

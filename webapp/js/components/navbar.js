@@ -20,7 +20,6 @@ const LINKS = [
   { file: 'positions.html', label: 'Posiciones', icon: '🛏️' },
   { file: 'alerts.html', label: 'Alertas', icon: '🔔' },
   { file: 'history.html', label: 'Historial', icon: '📈' },
-  { file: 'settings.html', label: 'Ajustes', icon: '⚙️', adminOnly: true },
   { file: 'apis.html', label: 'APIs', icon: '🔌' },
   { file: 'manual.html', label: 'Manual', icon: '📖' },
   { file: 'contact.html', label: 'Contacto', icon: '✉️' },

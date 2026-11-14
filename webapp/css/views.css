@@ -185,65 +185,14 @@
 
 /* --- Sensors --------------------------------------------------------------------- */
 
-.bed-map {
-  position: relative;
-  aspect-ratio: 3 / 5;
-  max-width: 400px;
-  margin: 0 auto var(--sp-4);
-}
-
-.bed-map__body {
-  position: absolute;
-  inset: 5% 16%;
-  background: var(--surface-3);
-  border: 2px solid var(--border-strong);
-  border-radius: 34px;
-  box-shadow: inset 0 0 0 8px var(--surface), inset 0 0 24px rgba(0, 0, 0, 0.05);
-}
-
-.bed-cell {
-  position: absolute;
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  box-shadow: var(--shadow);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-  transition: background var(--transition);
-  border: 2px solid rgba(255, 255, 255, 0.4);
-}
-
-.bed-cell--empty {
-  background: var(--surface-2) !important;
-  color: var(--text-muted);
-  text-shadow: none;
-  border-color: var(--border);
-}
-
-.bed-cell__label {
-  font-size: 0.68rem;
-  font-weight: 700;
-}
-
-.bed-cell__value {
-  font-size: 0.95rem;
-  font-weight: 800;
-}
-
-.bed-cell__key {
-  font-size: 0.6rem;
-  opacity: 0.85;
-}
-
 .sensor-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: var(--sp-4);
+}
+
+.sensor-grid--charts {
+  grid-template-columns: 1fr;
 }
 
 .sensor-card {
@@ -275,39 +224,9 @@
   font-size: 1.35rem;
 }
 
-.sensor-bar {
-  height: 8px;
-  background: var(--surface-2);
-  border-radius: var(--radius-pill);
-  overflow: hidden;
-}
-
-.sensor-bar__fill {
-  height: 100%;
-  width: 0%;
-  border-radius: var(--radius-pill);
-  background: var(--accent);
-  transition: width var(--transition), background var(--transition);
-}
-
-.legend {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sp-2);
-  margin-top: var(--sp-2);
-}
-
-.legend__label {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.legend__bar {
-  width: 150px;
-  height: 8px;
-  border-radius: var(--radius-pill);
-  background: linear-gradient(to right, hsl(130, 72%, 46%), hsl(65, 72%, 46%), hsl(0, 72%, 46%));
+.sensor-card canvas {
+  width: 100%;
+  height: 180px;
 }
 
 /* --- Alerts ----------------------------------------------------------------------- */
@@ -542,19 +461,6 @@
 @media (max-width: 760px) {
   .grid--2 {
     grid-template-columns: 1fr;
-  }
-
-  .bed-cell {
-    width: 58px;
-    height: 58px;
-  }
-
-  .bed-cell__label {
-    font-size: 0.6rem;
-  }
-
-  .bed-cell__value {
-    font-size: 0.82rem;
   }
 }
 

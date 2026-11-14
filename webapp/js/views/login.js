@@ -1,5 +1,5 @@
 // ============================================================================
-// login.js — Vista de login a pantalla completa (ya sin usuarios de demo).
+// login.js — Vista de login a pantalla completa (sin usuarios demo visibles).
 // El esqueleto vive en login.html; aquí solo se monta la tarjeta compartida
 // de views/authCard.js dentro de #view-root (que ya es un <main class="login-screen">).
 // ============================================================================

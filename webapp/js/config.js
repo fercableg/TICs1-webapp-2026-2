@@ -7,11 +7,11 @@ export const CONFIG = {
   // When `true`, every apiClient call resolves against the in-browser mock
   // generator (js/services/mockData.js) and no network is required.
   // Flip to `false` once the Supabase backend is provisioned.
-  USE_MOCK_DATA: true,
+  USE_MOCK_DATA: false,
 
   // Supabase REST endpoint — only consulted when USE_MOCK_DATA === false.
-  API_BASE_URL: 'https://YOUR-PROJECT.supabase.co/rest/v1',
-  SUPABASE_ANON_KEY: 'YOUR-ANON-KEY-HERE',
+  API_BASE_URL: 'https://vjiqkeckqkejxmddqubx.supabase.co/rest/v1',
+  SUPABASE_ANON_KEY: 'sb_publishable_VUAoX4rmJ2caeT2IJ-h2zg_E1O1a29i',
 
   // Runtime defaults.
   DEFAULT_DEVICE_ID: 'esp32-001',

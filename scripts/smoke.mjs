@@ -46,17 +46,21 @@ import * as vMonitoreo from '../webapp/js/views/monitoreo.js';
 import * as vPositions from '../webapp/js/views/positions.js';
 import * as vAlerts from '../webapp/js/views/alerts.js';
 import * as vHistory from '../webapp/js/views/history.js';
-import * as vSettings from '../webapp/js/views/settings.js';
 import * as vApis from '../webapp/js/views/apis.js';
 import * as vManual from '../webapp/js/views/manual.js';
 import * as vContact from '../webapp/js/views/contact.js';
 import * as vAbout from '../webapp/js/views/about.js';
 
+// El smoke test ejercita SIEMPRE el backend simulado a través de apiClient, para
+// poder correr offline en CI sin depender del flag desplegado en config.js
+// (que ahora apunta a Supabase real). Se fuerza solo en el contexto del test.
+CONFIG.USE_MOCK_DATA = true;
+
 const IMPORTED = [
   'config', 'utils', 'dom', 'store', 'ui', 'chart', 'theme', 'auth',
   'mockData', 'apiClient', 'poller', 'navbar', 'helpers', 'settingsForm',
   'authCard', 'landing', 'login', 'registro', 'profile', 'dashboard',
-  'monitoreo', 'positions', 'alerts', 'history', 'settings', 'apis', 'manual',
+  'monitoreo', 'positions', 'alerts', 'history', 'apis', 'manual',
   'contact', 'about',
 ];
 
@@ -91,7 +95,7 @@ console.log('Smoke test — Monitoreo de Colchón Inteligente\n');
 
 console.log(`[1] Module imports (${IMPORTED.length})`);
 check(`all ${IMPORTED.length} modules imported`, () => {
-  assert.ok(IMPORTED.length === 29, 'expected 29 modules');
+  assert.ok(IMPORTED.length === 28, 'expected 28 modules');
   assert.equal(typeof CONFIG, 'object');
   assert.equal(typeof vDashboard.init, 'function');
   assert.equal(typeof vMonitoreo.init, 'function');
@@ -99,7 +103,7 @@ check(`all ${IMPORTED.length} modules imported`, () => {
 });
 
 console.log('\n[2] config');
-check('mock mode is enabled', () => assert.equal(CONFIG.USE_MOCK_DATA, true));
+check('smoke forces mock mode (deployed flag may point to Supabase)', () => assert.equal(CONFIG.USE_MOCK_DATA, true));
 check('firmware constants present', () => {
   assert.equal(CONFIG.FIRMWARE.ADC_MAX, 4095);
   assert.equal(CONFIG.FIRMWARE.EMPTY_BED_MIN_WEIGHT, 300);
@@ -139,7 +143,7 @@ check('esc escapes HTML', () => {
 });
 check('uid prefixes', () => assert.ok(utils.uid('dev').startsWith('dev-')));
 check('safeNum: omit bounds for "no limit" (null coerces to 0)', () => {
-  // Regression guard for settings.js readNumber: passing null as min/max does
+  // Regression guard for settingsForm.js readNumber: passing null as min/max does
   // NOT mean "unbounded" — it coerces to 0 and rejects every positive value.
   assert.equal(utils.safeNum('72', null, null), null);
   assert.equal(utils.safeNum('72'), 72);
@@ -162,13 +166,15 @@ check('subscribe fires and unsubscribes', () => {
 
 console.log('\n[5] auth (RBAC)');
 check('admin login succeeds and is admin', () => {
-  const res = auth.login('admin', 'admin123');
+  const res = auth.login('admin', 'password');
   assert.equal(res.ok, true);
   assert.equal(res.user.role, auth.ROLES.ADMIN);
   assert.equal(auth.isAdmin(res.user), true);
 });
-check('client login succeeds and is not admin', () => {
-  const res = auth.login('cliente', 'cliente123');
+check('registered user logs in as client and is not admin', () => {
+  const reg = auth.register({ name: 'Cuidador Test', username: 'cuidador', password: 'secret123' });
+  assert.equal(reg.ok, true);
+  const res = auth.login('cuidador', 'secret123');
   assert.equal(res.ok, true);
   assert.equal(res.user.role, auth.ROLES.CLIENT);
   assert.equal(auth.isAdmin(res.user), false);
@@ -177,7 +183,7 @@ check('wrong password fails', () => {
   assert.equal(auth.login('admin', 'nope').ok, false);
 });
 check('login is case-insensitive on username', () => {
-  assert.equal(auth.login('ADMIN', 'admin123').ok, true);
+  assert.equal(auth.login('ADMIN', 'password').ok, true);
 });
 check('getSession is null without browser storage', () => {
   assert.equal(auth.getSession(), null);
